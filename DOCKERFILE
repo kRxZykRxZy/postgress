@@ -1,17 +1,16 @@
+# Use official PostgreSQL 17 image
 FROM postgres:17
 
-# Install git and bash
+# Install git and bash for backup scripts
 RUN apt-get update && apt-get install -y git bash && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables (customize)
-ENV POSTGRES_USER=postgres
-ENV POSTGRES_PASSWORD=postgres
-ENV POSTGRES_DB=mydb
-ENV GITHUB_REPO=https://github.com/kRxZykRxZy/db-backups.git
-ENV GITHUB_TOKEN=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
+# Copy backup scripts
+COPY backup.sh /usr/local/bin/backup.sh
+RUN chmod +x /usr/local/bin/backup.sh
 
-# Copy entrypoint script
-COPY entrypoint.sh /docker-entrypoint-initdb.d/entrypoint.sh
-RUN chmod +x /docker-entrypoint-initdb.d/entrypoint.sh
-
+# Expose Postgres port
 EXPOSE 5432
+
+# Use default Postgres entrypoint
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["postgres"]
